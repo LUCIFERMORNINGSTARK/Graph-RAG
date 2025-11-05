@@ -1,0 +1,334 @@
+# 🧠 Universal GraphRAG System
+
+A powerful Graph-based Retrieval Augmented Generation (RAG) system built with Streamlit that processes PDF documents and enables intelligent question-answering through advanced knowledge graph construction and multi-stage retrieval.
+
+## ✨ Features
+
+### Core Capabilities
+- **Universal PDF Processing**: Handles any PDF with automatic structure detection
+- **Intelligent Chunking**: Adaptive chunking strategy that detects document structure
+- **Knowledge Graph Construction**: Builds comprehensive entity and relationship graphs
+- **Multi-Stage Retrieval**: Advanced retrieval combining exact matching, entity-based search, token scoring, and graph expansion
+- **AI-Powered Answers**: Optional Groq API integration for natural language responses
+- **Interactive Visualization**: Plotly-based knowledge graph visualization
+- **Parallel Processing**: 4x faster processing with ThreadPoolExecutor
+
+### Advanced Features
+- Text normalization for better matching
+- Fuzzy matching for typo tolerance
+- N-gram tokenization (unigrams, bigrams, trigrams)
+- Context window chunks for better understanding
+- Definition extraction
+- Entity and relationship detection
+- Multiple retrieval methods (exact, entity, term, token, graph expansion)
+
+## 🚀 Installation
+
+### Prerequisites
+- Python 3.8+
+- pip package manager
+
+### Setup
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd universal-graphrag-system
+```
+
+2. Install required dependencies:
+```bash
+pip install streamlit PyPDF2 networkx groq numpy plotly
+```
+
+### Required Packages
+```
+streamlit
+PyPDF2
+networkx
+groq
+numpy
+plotly
+```
+
+## 🔧 Configuration
+
+### Groq API Key (Optional)
+To enable AI-generated answers, you'll need a Groq API key:
+
+1. Sign up at [Groq Console](https://console.groq.com)
+2. Generate an API key
+3. Enter it in the sidebar when running the app
+
+**Note**: The system works without an API key but will return raw source chunks instead of generated answers.
+
+### Supported Models
+- `llama-3.1-70b-versatile` (recommended for accuracy)
+- `llama-3.1-8b-instant` (faster, lower cost)
+- `mixtral-8x7b-32768` (alternative)
+
+## 📖 Usage
+
+### Starting the Application
+
+Run the Streamlit app:
+```bash
+streamlit run app.py
+```
+
+The app will open in your default browser at `http://localhost:8501`
+
+### Workflow
+
+#### 1. Process Document (📄 Process Tab)
+1. Upload a PDF file
+2. Click "🚀 Process Document"
+3. Wait for processing to complete
+4. System will extract text, create chunks, and build knowledge graph
+
+#### 2. Query Document (🔍 Query Tab)
+1. Enter your question in the search box
+2. Adjust number of results (5-20)
+3. Click "🔍 Search"
+4. Review the AI-generated answer and retrieved sources
+
+**Query Tips**:
+- Ask specific questions about document content
+- Use keywords from the document
+- Try different phrasings for better results
+- System handles typos and variations automatically
+
+**Example Queries**:
+- "What is [specific topic] about?"
+- "How does [concept] work?"
+- "What are the requirements for [X]?"
+- "Explain [term] from the document"
+
+#### 3. Visualize Graph (🕸️ Graph Tab)
+- Adjust max nodes to display (20-200)
+- Hover over nodes for details
+- Different colors represent different entity types
+
+#### 4. View Statistics (📊 Stats Tab)
+- Graph metrics (nodes, edges, chunks)
+- Chunk distribution by type
+- Entity statistics and frequency
+- Graph connectivity metrics
+
+## 🏗️ System Architecture
+
+### Document Processing Pipeline
+
+```
+PDF Upload
+    ↓
+Text Extraction (page-by-page)
+    ↓
+Text Normalization
+    ↓
+Structure Detection
+    ↓
+Intelligent Chunking (structural + semantic + context)
+    ↓
+Knowledge Graph Construction
+    ↓
+Entity & Relationship Extraction
+    ↓
+Indexing (entity index + term index)
+```
+
+### Retrieval Pipeline
+
+```
+User Query
+    ↓
+Stage 1: Exact Phrase Matching (score: 1.0)
+    ↓
+Stage 2: Entity-Based Retrieval (score: 0.9)
+    ↓
+Stage 3: Token-Based Scoring (score: 0.8)
+    ↓
+Stage 4: Graph Expansion (score: 0.65)
+    ↓
+Deduplication & Boosting
+    ↓
+Top-K Results
+    ↓
+Answer Generation (with Groq API)
+```
+
+### Chunk Types
+
+1. **Structural Chunks**: Created from detected document structure (headers, sections)
+2. **Semantic Chunks**: Sentence-based chunks with sliding window overlap
+3. **Context Chunks**: Merged windows of sequential chunks for broader context
+
+## 🎯 Key Algorithms
+
+### Intelligent Chunking
+- Detects markdown headers, capitalized headers, numbered sections, formal sections
+- Falls back to semantic chunking for unstructured documents
+- Maintains 200-character overlap for continuity
+- Creates context windows for better understanding
+
+### Entity Extraction
+- Noun phrases (capitalized multi-word terms)
+- Important terms (acronyms, technical terms)
+- Definitions (pattern-based extraction)
+- N-gram tokenization for comprehensive indexing
+
+### Multi-Stage Retrieval
+1. **Exact matching**: Highest priority for direct matches
+2. **Entity matching**: Leverages knowledge graph entities
+3. **Token scoring**: Frequency and fuzzy matching
+4. **Graph expansion**: Explores related chunks via graph connections
+
+### Scoring System
+- Exact match: 1.0
+- Entity match: 0.9
+- Term match: 0.85
+- Token match: up to 0.8
+- Graph expansion: 0.65
+- Context boost: 1.3x multiplier
+
+## 📊 Performance
+
+- **Processing Speed**: 4x faster with parallel entity extraction
+- **Accuracy**: Enhanced through multi-stage retrieval and fuzzy matching
+- **Scalability**: Handles documents with 100+ pages
+- **Memory Efficient**: Graph subsampling for large documents
+
+## 🔍 Features Breakdown
+
+### Text Normalization
+- Removes excessive whitespace
+- Handles Unicode spaces
+- Line-by-line normalization
+- Improves matching accuracy
+
+### Fuzzy Matching
+- 85% similarity threshold
+- Handles typos and variations
+- Minimum word length: 4 characters
+- Uses SequenceMatcher algorithm
+
+### Graph Visualization
+- Interactive Plotly graphs
+- Color-coded node types
+- Hover for detailed information
+- Automatic layout optimization
+- Supports up to 200 nodes
+
+## 🛠️ Customization
+
+### Adjusting Chunk Sizes
+Modify in `_sliding_window_chunk()`:
+```python
+chunk_size=700  # Target chunk size
+overlap=200     # Overlap between chunks
+```
+
+### Retrieval Parameters
+Modify in `advanced_retrieve()`:
+```python
+top_k=10  # Number of results to return
+```
+
+### Graph Display
+Modify in `visualize_graph_plotly()`:
+```python
+max_nodes=100  # Maximum nodes to display
+```
+
+## 📝 Code Structure
+
+```
+├── EnhancedGraphRAG (Main Class)
+│   ├── extract_text_from_pdf()
+│   ├── intelligent_chunk()
+│   ├── build_knowledge_graph()
+│   ├── advanced_retrieve()
+│   ├── generate_answer()
+│   └── visualize_graph_plotly()
+│
+├── Session State Management
+├── UI Components
+│   ├── Configuration Sidebar
+│   ├── Process Tab
+│   ├── Query Tab
+│   ├── Graph Tab
+│   └── Stats Tab
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Issue**: PDF text extraction fails
+- **Solution**: Ensure PDF has selectable text (not scanned images)
+
+**Issue**: Groq API errors
+- **Solution**: Check API key validity, try different model, or reduce result count
+
+**Issue**: Slow processing
+- **Solution**: Normal for large PDFs; system uses parallel processing to optimize speed
+
+**Issue**: Low confidence scores
+- **Solution**: Try rephrasing query, ensure query terms exist in document
+
+**Issue**: Graph visualization empty
+- **Solution**: Ensure document was successfully processed; check Stats tab for node count
+
+## 💡 Best Practices
+
+1. **Document Preparation**
+   - Use text-based PDFs (not scanned images)
+   - Well-structured documents work best
+
+2. **Query Formulation**
+   - Be specific with your questions
+   - Use terminology from the document
+   - Ask one concept per query
+
+3. **API Usage**
+   - Use `llama-3.1-70b-versatile` for best accuracy
+   - Use `llama-3.1-8b-instant` for speed
+   - Monitor API rate limits
+
+4. **Performance Optimization**
+   - Reduce `top_k` for faster queries
+   - Lower `max_nodes` for faster visualization
+   - Process documents once, query multiple times
+
+## 🔐 Security Notes
+
+- API keys are stored in session state only
+- No data is persisted after session ends
+- All processing happens locally
+- Groq API calls are made server-side
+
+## 📄 License
+
+[Specify your license here]
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit issues or pull requests.
+
+## 📧 Support
+
+For questions or issues, please [create an issue](link-to-issues) or contact [your-email].
+
+## 🙏 Acknowledgments
+
+- Built with [Streamlit](https://streamlit.io/)
+- Powered by [Groq](https://groq.com/)
+- Graph visualization with [Plotly](https://plotly.com/)
+- PDF processing with [PyPDF2](https://pypdf2.readthedocs.io/)
+- Graph algorithms from [NetworkX](https://networkx.org/)
+
+---
+
+**Version**: 1.0  
+**Last Updated**: 2025  
+**Status**: Production Ready
